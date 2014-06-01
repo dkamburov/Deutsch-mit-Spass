@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Registrieren</title>
+    </head>
+    <body>
+    
+    <body>
+        <h1>Registrieren</h1>
+
+        {% if registered %}
+        <strong>Danke, für Registrieren!</strong>
+        <button onclick='location.href="/website/login"'>Anmelden</button>
+        {% else %}
+
+        <form method='post' action='register'>
+
+            {% csrf_token %}
+
+            {% for field in form %}
+            {{ field.errors }}
+            {{ field.label_tag }}
+            {{ field }}
+            <br/>
+            {% endfor %}
+
+            <input type='submit' name='submit' value='Registrieren'>
+        </form>
+        {% endif %}
+    </body>
+    </body>
+</html>

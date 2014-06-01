@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>Korrigieren</title>
+    </head>
+    <body>
+        {% if role == 'Teacher' %}
+        <form action='correction' method='POST'>
+        {% csrf_token %} 
+        {{ form.as_p }}
+        {% endif %}
+        <input type='submit' name='submit' value='Bild'>
+        </form>
+    </body>
+</html>

@@ -1,1 +1,11 @@
-sdasd
+<html>
+    <head>
+        <title>Übungen</title>
+    </head>
+    <body>
+        <h1>Übungen ({{username}})</h1>
+        {% if role == 'Teacher' %}
+        <button onclick='location.href="/website/correction"'>Korrigieren bilden</button>
+        {% endif %}
+    </body>
+</html>

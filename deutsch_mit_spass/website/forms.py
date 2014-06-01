@@ -13,3 +13,8 @@ class RegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+
+class CorrectingExerciseForm(forms.Form):
+    correct_sentence = forms.CharField(widget=forms.Textarea)
+    wrong_sentence = forms.CharField(widget=forms.Textarea)

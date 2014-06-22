@@ -17,4 +17,5 @@ class RegisterForm(forms.ModelForm):
 
 class CorrectingExerciseForm(forms.Form):
     correct_sentence = forms.CharField(widget=forms.Textarea)
+    second_correct_sentence = forms.CharField(widget=forms.Textarea)
     wrong_sentence = forms.CharField(widget=forms.Textarea)

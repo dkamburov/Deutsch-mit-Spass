@@ -33,8 +33,10 @@ class Choice(models.Model):
     text = models.CharField(max_length=50)
     excercise = models.ForeignKey(ReadingExercise)
 
+
 class CorrectingExercise(models.Model):
     correct_sentence = models.CharField(max_length=300)
+    second_correct_sentence = models.CharField(max_length=300, default="")
     wrong_sentence = models.CharField(max_length=300)
 
 #class OrderingExercise(models.Model):

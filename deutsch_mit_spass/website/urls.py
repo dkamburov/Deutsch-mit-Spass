@@ -9,7 +9,9 @@ urlpatterns = patterns('website.views',
     url(r'^exercises$', 'exercises_view', name='exercises'),
     url(r'^correction$', 'correction_view', name='correction'),
     url(r'^translation$', 'translation_view', name='translation'),
+    url(r'^reading$', 'reading_view', name='reading'),
     url(r'^doexercises$', 'do_exercises', name='doexercises'),
     url(r'^docorrections$', 'do_correcting_exercises', name='docorrections'),
-    url(r'^dotranslations$', 'do_translating_exercises', name='dotranslations')
+    url(r'^dotranslations$', 'do_translating_exercises', name='dotranslations'),
+    url(r'^doreading$', 'do_reading_exercises', name='dotranslations')
 )

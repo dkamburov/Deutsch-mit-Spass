@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from website.models import UserProfile
 from website.models import CorrectingExercise, TranslationExercise,\
-    UserProfile
+    UserProfile, ReadingExercise
 
 
 
@@ -115,6 +115,13 @@ class DeutchMitSpassLoggedInStudent(TestCase):
                 {'answer': 'nicht schlecht', 'id': '1'})
         self.assertEquals(resp.content, b'correct')
 
+    def test_doreadings(self):
+        resp = self.client.get('/website/doreading')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('reading_exercises' in resp.context)
+        self.assertTrue('username' in resp.context)
+        self.assertEqual(resp.context['username'], 'test')
+
     def test_access_exercises(self):
         resp = self.client.get('/website/exercises')
         self.assertEqual(resp.status_code, 200)
@@ -145,6 +152,26 @@ class DeutchMitSpassLoggedInStudent(TestCase):
             'translated_example': 'should not add'})
 #       student should not add exercises
         self.assertEqual(len(TranslationExercise.objects.all()), 0)
+
+    def test_access_add_readings(self):
+        resp = self.client.get('/website/reading')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Student')
+        resp_post = self.client.post('/website/reading', {
+            'text': 'Lorem ipsum .......................',
+            'question': 'Ist das text ohne Wert',
+            'first_choise': 'Ja',
+            'first_is_correct': '1',
+            'second_choise': 'Nein',
+            'second_is_correct': '0',
+            'third_choise': 'Nein',
+            'third_is_correct': '0',
+            'fourt_choise': 'Nein',
+            'fourt_is_correct': '0'
+            })
+#       student should not add exercises
+        self.assertEqual(len(ReadingExercise.objects.all()), 0)
 
 
 class DeutchMitSpassLoggedInTeacher(TestCase):
@@ -219,9 +246,9 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Teacher')
         resp_post = self.client.post('/website/correction', {
-            'correct_sentence': 'should not add',
-            'second_correct_sentence': 'should not add',
-            'wrong_sentence': 'should not be added'})
+            'correct_sentence': 'should be added',
+            'second_correct_sentence': 'should be added',
+            'wrong_sentence': 'should be add'})
 #       teacher should be able to add exercises
         self.assertEqual(len(CorrectingExercise.objects.all()), 1)
 
@@ -231,7 +258,46 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Teacher')
         resp_post = self.client.post('/website/translation', {
-            'example': 'should not add',
-            'translated_example': 'should not add'})
+            'example': 'should add',
+            'translated_example': 'should add'})
 #       teacher should be able to add exercises
         self.assertEqual(len(TranslationExercise.objects.all()), 1)
+
+    def test_access_add_readings(self):
+        resp = self.client.get('/website/reading')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Teacher')
+        resp_post = self.client.post('/website/reading', {
+            'text': 'Lorem ipsum .......................',
+            'question': 'Ist das text ohne Wert',
+            'first_choise': 'Ja',
+            'first_is_correct': '1',
+            'second_choise': 'Nein',
+            'second_is_correct': '0',
+            'third_choise': 'Nein',
+            'third_is_correct': '0',
+            'fourt_choise': 'Nein',
+            'fourt_is_correct': '0'
+            })
+#       teacher should be able to add exercises
+        self.assertEqual(len(ReadingExercise.objects.all()), 1)
+        self.assertEqual(resp_post.status_code, 200)
+
+    def test_doreadings_exercise_correct(self):
+        resp_post = self.client.post('/website/reading', {
+            'text': 'Lorem ipsum .......................',
+            'question': 'Ist das text ohne Wert',
+            'first_choise': 'Ja',
+            'first_is_correct': '1',
+            'second_choise': 'Nein',
+            'second_is_correct': '0',
+            'third_choise': 'Nein',
+            'third_is_correct': '0',
+            'fourt_choise': 'Nein',
+            'fourt_is_correct': '0'
+            })
+        self.assertEquals(len(ReadingExercise.objects.all()), 1)
+        resp = self.client.post('/website/doreading',
+                {'answer': 'Ja', 'id': '1'})
+        self.assertEquals(resp.content, b'correct')

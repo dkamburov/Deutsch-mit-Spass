@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
-from website.forms import LoginForm, RegisterForm, CorrectingExerciseForm,\
-    TranslatingExerciseForm
-from website.models import CorrectingExercise, TranslationExercise, UserProfile
+from website.forms import LoginForm, RegisterForm,\
+    CorrectingExerciseForm, TranslatingExerciseForm,\
+    ReadingExerciseForm
+from website.models import CorrectingExercise, TranslationExercise,\
+    UserProfile, ReadingExercise, Choice
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -109,6 +111,27 @@ def translation_view(request):
     )
 
 
+@login_required(login_url='/website/login')
+def reading_view(request):
+    return add_exercise(
+        request,
+        ReadingExerciseForm,
+        ('text',
+            'question'),
+        ReadingExercise.objects,
+        'reading.html'
+    )
+
+
+def create_choices_reading(exercise, request):
+    for choice in ['first', 'second', 'third', 'fourt']:
+        if request.POST[choice + '_choise']:
+            Choice.objects.create(
+                text=request.POST[choice + '_choise'],
+                exercise=exercise,
+                is_correct=request.POST[choice + '_is_correct'])
+
+
 def add_exercise(request, exercise_form, params, exercise_objects, template):
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
@@ -120,7 +143,9 @@ def add_exercise(request, exercise_form, params, exercise_objects, template):
             arguments = {}
             for param in params:
                 arguments[param] = request.POST[param]
-            exercise_objects.create(**arguments)
+            exercise = exercise_objects.create(**arguments)
+            if type(exercise) is ReadingExercise:
+                create_choices_reading(exercise, request)
             return render(request, template, {
                 'form': exercise_form(),
                 'role': role,
@@ -181,3 +206,23 @@ def do_translating_exercises(request):
         return render(request, 'translating-exercises.html', {
             'username': request.user.username,
             'translation_exercises': exercises})
+
+
+@csrf_exempt
+@login_required(login_url='/website/login')
+def do_reading_exercises(request):
+    if request.method == 'POST':
+        selected_choice = request.POST['answer']
+        choice_id = request.POST['id']
+        choice = get_object_or_404(Choice, pk=choice_id)
+        if choice.is_correct:
+            return HttpResponse('correct')
+        else:
+            return HttpResponse('notcorrect')
+    else:
+        exercises = ReadingExercise.objects.all()
+        for exercise in exercises:
+            exercise.choices = Choice.objects.filter(exercise=exercise)
+        return render(request, 'reading-exercises.html', {
+            'username': request.user.username,
+            'reading_exercises': exercises})

@@ -84,4 +84,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = "website.User"
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
+
+#AUTH_USER_MODEL = "website.MyUser"
+
+#AUTH_PROFILE_MODULE = 'website.UserProfile'

@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
-from website.forms import LoginForm, RegisterForm, CorrectingExerciseForm
-from website.models import CorrectingExercise
+from website.forms import LoginForm, RegisterForm, CorrectingExerciseForm,\
+    TranslatingExerciseForm
+from website.models import CorrectingExercise, TranslationExercise, UserProfile
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from random import shuffle
 
 
 def index(request):
@@ -40,7 +42,8 @@ def login_view(request):
 def welcome(request):
     if request.user.is_anonymous():
         return render(request, 'welcome.html')
-    role = request.user.ROLE_CHOISES[request.user.role][1]
+    profile = UserProfile.objects.filter(user=request.user)[0]
+    role = profile.ROLE_CHOISES[profile.role][1]
     return render(request, 'welcome.html', {
         'username': request.user.username,
         'role': role
@@ -62,12 +65,17 @@ def register_view(request):
             user = form.save()
             user.set_password(user.password)
             user.save()
+            user_profile = UserProfile()
+            user_profile.user = user
+            user_profile.role = UserProfile.STUDENT
+            user_profile.save()
             registered = True
     return render(request, 'register.html', locals())
 
 
 def exercises_view(request):
-    role = request.user.ROLE_CHOISES[request.user.role][1]
+    profile = UserProfile.objects.filter(user=request.user)[0]
+    role = profile.ROLE_CHOISES[profile.role][1]
     return render(request, 'exercises.html', {
         'username': request.user.username,
         'role': role
@@ -75,34 +83,61 @@ def exercises_view(request):
 
 
 def correction_view(request):
-    role = request.user.ROLE_CHOISES[request.user.role][1]
+    return add_exercise(
+        request,
+        CorrectingExerciseForm,
+        ('correct_sentence',
+            'second_correct_sentence',
+            'wrong_sentence'),
+        CorrectingExercise.objects,
+        'correction.html'
+    )
+
+
+def translation_view(request):
+    return add_exercise(
+        request,
+        TranslatingExerciseForm,
+        ('example',
+            'translated_example'),
+        TranslationExercise.objects,
+        'translation.html'
+    )
+
+
+def add_exercise(request, exercise_form, params, exercise_objects, template):
+    profile = UserProfile.objects.filter(user=request.user)[0]
+    role = profile.ROLE_CHOISES[profile.role][1]
     if request.method == 'POST':
         data = request.POST if request.POST else None
-        form = CorrectingExerciseForm(data)
+        form = exercise_form(data)
         if form.is_valid():
-            correct_sentence = request.POST['correct_sentence']
-            second_correct_sentence = request.POST['second_correct_sentence']
-            wrong_sentence = request.POST['wrong_sentence']
-            CorrectingExercise.objects.create(
-                correct_sentence=correct_sentence,
-                second_correct_sentence=second_correct_sentence,
-                wrong_sentence=wrong_sentence)
-            return render(request, 'correction.html', {
-                'form': CorrectingExerciseForm(),
+            arguments = {}
+            for param in params:
+                arguments[param] = request.POST[param]
+            exercise_objects.create(**arguments)
+            return render(request, template, {
+                'form': exercise_form(),
                 'role': role,
                 'created': True
             })
         return HttpResponseRedirect('/thanks/')
     else:
-        form = CorrectingExerciseForm()
-        return render(request, 'correction.html', {
+        form = exercise_form()
+        return render(request, template, {
             'form': form,
             'role': role
         })
 
 
+def do_exercises(request):
+    return render(request, 'do_exercises.html', {
+        'username': request.user.username
+        })
+
+
 @csrf_exempt
-def do_exercises_view(request):
+def do_correcting_exercises(request):
     if request.method == 'POST':
         answer = request.POST['answer']
         exercise_id = request.POST['id']
@@ -113,7 +148,28 @@ def do_exercises_view(request):
         else:
             return HttpResponse('notcorrect')
     else:
-        return render(request, 'do_exercises.html', {
+        return render(request, 'correcting-exercises.html', {
             'username': request.user.username,
             'correcting_exercises': CorrectingExercise.objects.all()
             })
+
+
+@csrf_exempt
+def do_translating_exercises(request):
+    if request.method == 'POST':
+        answer = request.POST['answer']
+        exercise_id = request.POST['id']
+        exercise = get_object_or_404(TranslationExercise, pk=exercise_id)
+        if exercise.example == answer:
+            return HttpResponse('correct')
+        else:
+            return HttpResponse('notcorrect')
+    else:
+        exercises = TranslationExercise.objects.all()
+        for exercise in exercises:
+            shuffled = exercise.example.split()
+            shuffle(shuffled)
+            exercise.shuffled = shuffled
+        return render(request, 'translating-exercises.html', {
+            'username': request.user.username,
+            'translation_exercises': exercises})

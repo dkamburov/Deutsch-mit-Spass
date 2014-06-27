@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin, User
 
 class Lesson(models.Model):
     DIFFICULTIES_CHOISES = (
@@ -43,17 +43,30 @@ class CorrectingExercise(models.Model):
 #    pass
 
 
-class User(AbstractUser):
+#class User(AbstractUser):
+#    STUDENT = 0
+#    TEACHER = 1
+#    ROLE_CHOISES = (
+#        (STUDENT, "Student"),
+#        (TEACHER, "Teacher")
+#        )
+#    role = models.SmallIntegerField(
+#        choices=ROLE_CHOISES,
+#        default=0
+#        )
+#
+#    USERNAME_FIELD = 'username'
+#    REQUIRED_FIELDS = ['email']
+
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
     STUDENT = 0
     TEACHER = 1
     ROLE_CHOISES = (
-        (STUDENT, "Student"),
-        (TEACHER, "Teacher")
+       (STUDENT, "Student"),
+       (TEACHER, "Teacher")
         )
     role = models.SmallIntegerField(
         choices=ROLE_CHOISES,
         default=0
         )
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']

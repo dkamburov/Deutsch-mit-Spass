@@ -8,5 +8,8 @@ urlpatterns = patterns('website.views',
     url(r'^register$', 'register_view', name='register'),
     url(r'^exercises$', 'exercises_view', name='exercises'),
     url(r'^correction$', 'correction_view', name='correction'),
-    url(r'^doexercises$', 'do_exercises_view', name='correction')
+    url(r'^translation$', 'translation_view', name='translation'),
+    url(r'^doexercises$', 'do_exercises', name='doexercises'),
+    url(r'^docorrections$', 'do_correcting_exercises', name='docorrections'),
+    url(r'^dotranslations$', 'do_translating_exercises', name='dotranslations')
 )

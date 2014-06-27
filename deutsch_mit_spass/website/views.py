@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from random import shuffle
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -73,6 +74,7 @@ def register_view(request):
     return render(request, 'register.html', locals())
 
 
+@login_required(login_url='/website/login')
 def exercises_view(request):
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
@@ -82,6 +84,7 @@ def exercises_view(request):
     })
 
 
+@login_required(login_url='/website/login')
 def correction_view(request):
     return add_exercise(
         request,
@@ -94,6 +97,7 @@ def correction_view(request):
     )
 
 
+@login_required(login_url='/website/login')
 def translation_view(request):
     return add_exercise(
         request,
@@ -108,7 +112,8 @@ def translation_view(request):
 def add_exercise(request, exercise_form, params, exercise_objects, template):
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
-    if request.method == 'POST':
+    if request.method == 'POST' and\
+            role == UserProfile.ROLE_CHOISES[UserProfile.TEACHER][1]:
         data = request.POST if request.POST else None
         form = exercise_form(data)
         if form.is_valid():
@@ -130,6 +135,7 @@ def add_exercise(request, exercise_form, params, exercise_objects, template):
         })
 
 
+@login_required(login_url='/website/login')
 def do_exercises(request):
     return render(request, 'do_exercises.html', {
         'username': request.user.username
@@ -137,6 +143,7 @@ def do_exercises(request):
 
 
 @csrf_exempt
+@login_required(login_url='/website/login')
 def do_correcting_exercises(request):
     if request.method == 'POST':
         answer = request.POST['answer']
@@ -155,6 +162,7 @@ def do_correcting_exercises(request):
 
 
 @csrf_exempt
+@login_required(login_url='/website/login')
 def do_translating_exercises(request):
     if request.method == 'POST':
         answer = request.POST['answer']

@@ -1,17 +1,14 @@
-<html>
-    <head>
-        <title>Korrigieren</title>
-    </head>
-    <body>
+{% extends "base.html" %}
+{% block title %}Übersetzen{% endblock %}
+{% block content %}
         {% if role == 'Teacher' %}
         <form action='translation' method='POST'>
         {% csrf_token %} 
         {{ form.as_p }}
         {% endif %}
-        <input type='submit' name='submit' value='Bild'>
+        <input class="btn btn-default" type='submit' name='submit' value='Bild'>
         </form>
         {% if created %}
         <span>Übung ist erfolgreich erstellt.</span>
         {% endif %}
-    </body>
-</html>
+{% endblock %}

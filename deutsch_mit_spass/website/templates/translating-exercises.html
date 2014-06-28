@@ -1,29 +1,22 @@
-<html>
-    <head>
-        <title>Machen Sie Übungen</title>
-    {% load staticfiles %}
-    <script src="{% static "js/jquery-1.9.1.min.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/scripts.js" %}" type="text/javascript"></script>
-    </head>
-    <body>
-        <h1>Übersetzen Sie, bitte</h1>
-        <h1>{{username}}</h1>
-    <table>	
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+    <h3>Übersetzen Sie, bitte</h3>
+    <table class="table">	
     {% for exercise in translation_exercises %}
     <tr>
         <td><span>{{ exercise.translated_example }}</span></td>
         <td>
-            <div id="dragstart{{forloop.counter}}" style="width:350px;height:20px;padding:10px;border:1px solid #aaaaaa;" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <div id="dragstart{{forloop.counter}}" class="well" ondrop="drop(event)" ondragover="allowDrop(event)">
             {% for word in exercise.shuffled %}
             <span id="drag{{forloop.parentloop.counter}}{{forloop.counter}}" draggable="true" ondragstart="drag(event)">{{ word }} </span>
             {% endfor %}
             </div>
-            <div id="answer" style="width:350px;height:20px;padding:10px;border:1px solid #aaaaaa;" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <div id="answer" class="well" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         </td> 
-        <td><input type='submit' onclick='is_correct(this, {{exercise.id}}, "dotranslations")', ></td>
+        <td><input class="btn btn-default" onclick='is_correct(this, {{exercise.id}}, "dotranslations")' value='Check'></td>
         <td></td>
     </tr>
     {% endfor %}
     </table>
-    </body>
-</html>
+{% endblock %}

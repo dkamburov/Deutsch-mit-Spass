@@ -1,46 +1,40 @@
-<html>
-    <head>
-        <title>Machen Sie Übungen</title>
-    {% load staticfiles %}
-    <script src="{% static "js/jquery-1.9.1.min.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/scripts.js" %}" type="text/javascript"></script>
-    </head>
-    <body>
-        <h1>Übersetzen Sie, bitte</h1>
-        <h1>{{username}}</h1>
-    <table>	
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+        <h3>Übersetzen Sie, bitte</h3>
+    <table class='table'>	
     {% for exercise in exercises %}
     <tr>
         <td><span>{{ exercise.description }}</span></td>
         <td>
-            <ul>
-                <li>
+            <ul class="list-group">
+                <li class="list-group-item">
                     <span>{{ exercise.first }}</span>
-                    <select id="first">
+                    <select id="first" class='form-control'>
                         {% for option in exercise.options %}
                             <option>{{ option }}</option>
                         {% endfor %}
                     </select>
                 </li>
-                <li>
+                <li class="list-group-item">
                     <span>{{ exercise.second }}</span>
-                    <select id="second">
+                    <select id="second" class='form-control'>
                         {% for option in exercise.options %}
                             <option>{{ option }}</option>
                         {% endfor %}
                     </select>
                 </li>
-                <li>
+                <li class="list-group-item">
                     <span>{{ exercise.third }}</span>
-                    <select id="third">
+                    <select id="third" class='form-control'>
                         {% for option in exercise.options %}
                             <option>{{ option }}</option>
                         {% endfor %}
                     </select>
                 </li>
-                <li>
+                <li class="list-group-item">
                     <span>{{ exercise.fourt }}</span>
-                    <select id="fourt">
+                    <select id="fourt" class='form-control'>
                         {% for option in exercise.options %}
                             <option>{{ option }}</option>
                         {% endfor %}
@@ -49,10 +43,9 @@
             </ul>
         </td>
         <td>
-        <td><input type='submit' onclick='is_ordering_correct(this, {{exercise.id}})', ></td>
+        <td><input type='submit' class="btn btn-default" onclick='is_ordering_correct(this, {{exercise.id}})' value="Check" ></td>
         <td></td>
     </tr>
     {% endfor %}
     </table>
-    </body>
-</html>
+{% endblock %}

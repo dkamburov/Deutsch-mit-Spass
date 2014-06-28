@@ -2,11 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
-from website.forms import LoginForm, RegisterForm,\
+from website.forms import LoginForm, RegisterForm, LessonForm,\
     CorrectingExerciseForm, TranslatingExerciseForm,\
     ReadingExerciseForm, FillInExerciseForm, OrderingExerciseForm
 from website.models import CorrectingExercise, TranslationExercise,\
-    UserProfile, ReadingExercise, Choice, FillInExercise, OrderingExercise
+    UserProfile, ReadingExercise, Choice, FillInExercise, OrderingExercise,\
+    Lesson
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -34,10 +35,10 @@ def login_view(request):
                     login(request, user)
                     return redirect('welcome')
                 else:
-                    return redirect('/notlogin')
+                    return redirect('thanks')
             else:
-                return redirect('/incorrect')
-            return HttpResponseRedirect('/thanks/')
+                return redirect('thanks')
+            return HttpResponseRedirect('thanks')
     else:
         form = LoginForm()
 
@@ -165,7 +166,7 @@ def create_choices_reading(exercise, request):
     ReadingExercise(many to one)
 
     Keyword arguments:
-    exercise (ReadingExercise) -- Reading exercise to link the choices
+    exercise -- Reading exercise to link the choices
     request -- request from client
     '''
     for choice in ['first', 'second', 'third', 'fourt']:
@@ -211,6 +212,18 @@ def ordering_view(request):
     )
 
 
+@login_required(login_url='/website/login')
+def lesson_view(request):
+    '''View for creating lesson'''
+    return add_exercise(
+        request,
+        LessonForm,
+        ('content', 'difficulty'),
+        Lesson.objects,
+        'lesson.html'
+    )
+
+
 def add_exercise(request, exercise_form, params, exercise_objects, template):
     '''Add exercise of specific type
 
@@ -241,7 +254,7 @@ def add_exercise(request, exercise_form, params, exercise_objects, template):
                 'role': role,
                 'created': True
             })
-        return HttpResponseRedirect('/thanks/')
+        return HttpResponseRedirect('thanks')
     else:
         form = exercise_form()
         return render(request, template, {
@@ -386,3 +399,17 @@ def do_ordering_exercises(request):
         return render(request, 'ordering-exercises.html', {
             'username': request.user.username,
             'exercises': exercises})
+
+
+@login_required(login_url='/website/login')
+def read_lesson(request):
+    '''View for reading lessons it is for students and teachers'''
+    lessons = Lesson.objects.all()
+    return render(request, 'read-lessons.html', {
+        'username': request.user.username,
+        'lessons': lessons})
+
+
+def thanks(request):
+    '''View if something went wrong'''
+    return render(request, 'thanks.html')

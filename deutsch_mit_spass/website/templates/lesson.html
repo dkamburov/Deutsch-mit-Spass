@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Lesen{% endblock %}
 {% block content %}
+    <body>
         {% if role == 'Teacher' %}
-        <form action='reading' method='POST'>
+        <form action='lesson' method='POST'>
         {% csrf_token %} 
         {{ form.as_p }}
         {% endif %}
-        <input class="btn btn-default" type='submit' name='submit' value='Bild'>
+        <input type='submit' class="btn btn-default" name='submit' value='Bild'>
         </form>
         {% if created %}
-        <span>Übung ist erfolgreich erstellt.</span>
+        <span>Lektion ist erfolgreich erstellt.</span>
         {% endif %}
 {% endblock %}

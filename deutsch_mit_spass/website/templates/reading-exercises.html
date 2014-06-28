@@ -1,28 +1,21 @@
-<html>
-    <head>
-        <title>Machen Sie Übungen</title>
-    {% load staticfiles %}
-    <script src="{% static "js/jquery-1.9.1.min.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/scripts.js" %}" type="text/javascript"></script>
-    </head>
-    <body>
-        <h1>Lesen Sie und antworten Sie die Frage</h1>
-        <h1>{{username}}</h1>
-    <table>	
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+    <h3>Lesen Sie und antworten Sie die Frage</h3>
+    <table class='table'>	
     {% for exercise in reading_exercises%}
     <tr>
         <td><span>{{ exercise.text }}</span></td>
         <td><span>{{ exercise.question }}</span></td>
         <td><span>
-                <select id="answer">
+                <select id="answer" class='form-control'>
                     {% for choice in exercise.choices %}
                     <option id="{{choice.id}}">{{choice.text}}</option>
                     {% endfor %}
                 </select>
-        <td><input type='submit' onclick='is_correct(this, $(this).parents("tr").find("select:last option:checked")[0].id, "doreading")', ></td>
+        <td><input class="btn btn-default" type='submit' onclick='is_correct(this, $(this).parents("tr").find("select:last option:checked")[0].id, "doreading")' value="Check"></td>
         <td></td>
     </tr>
     {% endfor %}
     </table>
-    </body>
-</html>
+{% endblock %}

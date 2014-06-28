@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+        <h3>Lektionen</h3>
+        <table class='table'>    
+        {% for lesson in lessons%}
+        <tr>
+            <td><p>{{ lesson.content }}</p></td>
+            <td><span>{{ lesson.difficulty }}</span></td>
+        </tr>
+        {% endfor %}
+    </table>
+    </body>
+</html>
+{% endblock %}

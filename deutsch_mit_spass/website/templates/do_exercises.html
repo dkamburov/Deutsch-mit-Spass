@@ -1,17 +1,15 @@
-<html>
-    <head>
-        <title>Machen Sie Übungen</title>
-    </head>
-    <body>
-        <h1>Machen Sie Übungen</h1>
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+    <h3>Machen Sie Übungen</h3>
     <table>
         <tr>
-            <td><button onclick='location.href="/website/docorrections"'>Korrigieren Übungen</button></td>
-            <td><button onclick='location.href="/website/dotranslations"'>Übersetzen Übungen</button></td>
-            <td><button onclick='location.href="/website/doreading"'>Lesen Übungen</button></td>
-            <td><button onclick='location.href="/website/dofillins"'>Füllen Übungen</button></td>
-            <td><button onclick='location.href="/website/doorderings"'>Bestellen Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/docorrections"'>Korrigieren Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/dotranslations"'>Übersetzen Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/doreading"'>Lesen Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/dofillins"'>Füllen Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/doorderings"'>Bestellen Übungen</button></td>
+            <td><button class="btn btn-default" onclick='location.href="/website/readlessons"'>Lektionen</button></td>
         </tr>
     </table>
-    </body>
-</html>
+{% endblock %}

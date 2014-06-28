@@ -1,15 +1,13 @@
-<html>
-    <head>
-        <title>Übungen</title>
-    </head>
-    <body>
-        <h1>Übungen ({{username}})</h1>
-        {% if role == 'Teacher' %}
-        <button onclick='location.href="/website/correction"'>Korrigieren bilden</button>
-        <button onclick='location.href="/website/translation"'>Übersetzen bilden</button>
-        <button onclick='location.href="/website/reading"'>Lesen bilden</button>
-        <button onclick='location.href="/website/fillin"'>Lücke füllen bilden</button>
-        <button onclick='location.href="/website/ordering"'>Bestellen bilden</button>
-        {% endif %}
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Übungen{% endblock %}
+{% block content %}
+    <h3>Übungen</h3>
+    {% if role == 'Teacher' %}
+    <button class="btn btn-default" onclick='location.href="/website/correction"'>Korrigieren bilden</button>
+    <button class="btn btn-default" onclick='location.href="/website/translation"'>Übersetzen bilden</button>
+    <button class="btn btn-default" onclick='location.href="/website/reading"'>Lesen bilden</button>
+    <button class="btn btn-default" onclick='location.href="/website/fillin"'>Lücke füllen bilden</button>
+    <button class="btn btn-default" onclick='location.href="/website/ordering"'>Bestellen bilden</button>
+    <button class="btn btn-default" onclick='location.href="/website/lesson"'>Lesson bilden</button>
+    {% endif %}
+{% endblock %}

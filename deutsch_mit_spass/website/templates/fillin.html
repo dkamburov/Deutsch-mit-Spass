@@ -1,8 +1,6 @@
-<html>
-    <head>
-        <title>Lücke füllen</title>
-    </head>
-    <body>
+{% extends "base.html" %}
+{% block title %}Lücke füllen{% endblock %}
+{% block content %}
         <p>
             Verwenden Sie *** in dem Satz direkt,
             es eine Lücke füllen zu machen
@@ -12,10 +10,9 @@
         {% csrf_token %} 
         {{ form.as_p }}
         {% endif %}
-        <input type='submit' name='submit' value='Bild'>
+        <input class="btn btn-default" type='submit' name='submit' value='Bild'>
         </form>
         {% if created %}
         <span>Übung ist erfolgreich erstellt.</span>
         {% endif %}
-    </body>
-</html>
+{% endblock %}

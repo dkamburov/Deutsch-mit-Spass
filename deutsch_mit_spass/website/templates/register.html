@@ -1,10 +1,7 @@
-<html>
-    <head>
-        <title>Registrieren</title>
-    </head>
-    <body>
-    
-    <body>
+{% extends "base.html" %}
+{% block title %}Registrieren{% endblock %}
+
+{% block content %}
         <h1>Registrieren</h1>
 
         {% if registered %}
@@ -23,9 +20,8 @@
             <br/>
             {% endfor %}
 
-            <input type='submit' name='submit' value='Registrieren'>
+            <input class="btn btn-default" type='submit' name='submit' value='Registrieren'>
         </form>
         {% endif %}
     </body>
-    </body>
-</html>
+{% endblock %}

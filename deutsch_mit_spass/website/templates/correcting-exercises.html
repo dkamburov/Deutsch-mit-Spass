@@ -1,20 +1,14 @@
-<html>
-    <head>
-        <title>Machen Sie Übungen</title>
-    {% load staticfiles %}
-    <script src="{% static "js/jquery-1.9.1.min.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/scripts.js" %}" type="text/javascript"></script>
-    </head>
-    <body>
-        <h1>Korrigieren Sie diese Sätze</h1>
-        <table>    
+{% extends "base.html" %}
+{% block title %}Machen Sie Übungen{% endblock %}
+{% block content %}
+        <h3>Korrigieren Sie diese Sätze</h3>
+        <table class='table'>    
         {% for exercise in correcting_exercises %}
         <tr>
-            <td><textarea id='answer'>{{ exercise.wrong_sentence }}</textarea></td>
-            <td><input type='submit' onclick='is_correct(this, {{exercise.id}}, "docorrections")'></td>
+            <td><textarea id='answer' class="form-control" rows="1">{{ exercise.wrong_sentence }}</textarea></td>
+            <td><input value='Check' class="btn btn-default" type='submit' onclick='is_correct(this, {{exercise.id}}, "docorrections")'></td>
             <td></td>
         </tr>
         {% endfor %}
     </table>
-    </body>
-</html>
+{% endblock %}

@@ -1,21 +1,18 @@
-<html>
-    <head>
-        <title>Lücke füllen</title>
-    </head>
-    <body>
-        <p>
-            Description is for homonyms or sinonyms
-            First should match with First match, etc ...
-        </p>
-        {% if role == 'Teacher' %}
-        <form action='ordering' method='POST'>
-        {% csrf_token %} 
-        {{ form.as_p }}
-        {% endif %}
-        <input type='submit' name='submit' value='Bild'>
-        </form>
-        {% if created %}
-        <span>Übung ist erfolgreich erstellt.</span>
-        {% endif %}
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}Bestellen{% endblock %}
+{% block content %}
+    <p>
+        Description is for homonyms or sinonyms
+        First should match with First match, etc ...
+    </p>
+    {% if role == 'Teacher' %}
+    <form action='ordering' method='POST'>
+    {% csrf_token %} 
+    {{ form.as_p }}
+    {% endif %}
+    <input class="btn btn-default" type='submit' name='submit' value='Bild'>
+    </form>
+    {% if created %}
+    <span>Übung ist erfolgreich erstellt.</span>
+    {% endif %}
+{% endblock %}

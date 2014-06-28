@@ -13,11 +13,14 @@ urlpatterns = patterns(
     url(r'^reading$', 'reading_view', name='reading'),
     url(r'^fillin$', 'fill_in_view', name='fillin'),
     url(r'^ordering$', 'ordering_view', name='ordering'),
+    url(r'^lesson$', 'lesson_view', name='lesson'),
     url(r'^doexercises$', 'do_exercises', name='doexercises'),
     url(r'^docorrections$', 'do_correcting_exercises', name='docorrections'),
     url(r'^dotranslations$', 'do_translating_exercises',
         name='dotranslations'),
     url(r'^doreading$', 'do_reading_exercises', name='dotranslations'),
     url(r'^dofillins$', 'do_fill_in_exercises', name='dofillins'),
-    url(r'^doorderings$', 'do_ordering_exercises', name='doordering')
+    url(r'^doorderings$', 'do_ordering_exercises', name='doordering'),
+    url(r'^readlessons$', 'read_lesson', name='readlessons'),
+    url(r'^thanks$', 'thanks', name='thanks')
 )

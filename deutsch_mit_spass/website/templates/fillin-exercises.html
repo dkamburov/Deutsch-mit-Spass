@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>Machen Sie Übungen</title>
+    {% load staticfiles %}
+    <script src="{% static "js/jquery-1.9.1.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/scripts.js" %}" type="text/javascript"></script>
+    </head>
+    <body>
+        <h1>Füllen Sie</h1>
+        <h1>{{username}}</h1>
+    <table>	
+    {% for exercise in fillin_exercises%}
+    <tr>
+        <td><span>{{ exercise.example }}</span></td>
+        <td><span>
+                <select id="answer">
+                    {% for choice in exercise.choices %}
+                    <option value="{{choice}}">{{choice}}</option>
+                    {% endfor %}
+                </select>
+        <td><input type='submit' onclick='is_correct(this, {{ exercise.id }}, "dofillins")', ></td>
+        <td></td>
+    </tr>
+    {% endfor %}
+    </table>
+    </body>
+</html>

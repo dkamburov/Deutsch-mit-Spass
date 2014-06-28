@@ -1,9 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from website.models import UserProfile
 from website.models import CorrectingExercise, TranslationExercise,\
-    UserProfile, ReadingExercise
-
+    UserProfile, ReadingExercise, FillInExercise, OrderingExercise
 
 
 class DeutschMitSpassCase(TestCase):
@@ -94,8 +92,8 @@ class DeutchMitSpassLoggedInStudent(TestCase):
         exercise.example = 'sehr gut'
         exercise.save()
         self.assertEquals(len(TranslationExercise.objects.all()), 1)
-        resp = self.client.post('/website/dotranslations',
-                {'answer': 'sehr gut', 'id': '1'})
+        resp = self.client.post('/website/dotranslations', {
+            'answer': 'sehr gut', 'id': '1'})
         self.assertEquals(resp.content, b'correct')
 
     def test_docorrections(self):
@@ -111,9 +109,24 @@ class DeutchMitSpassLoggedInStudent(TestCase):
         exercise.wrong_sentence = 'nein schlecht'
         exercise.save()
         self.assertEquals(len(CorrectingExercise.objects.all()), 1)
-        resp = self.client.post('/website/docorrections',
-                {'answer': 'nicht schlecht', 'id': '1'})
+        resp = self.client.post('/website/docorrections', {
+            'answer': 'nicht schlecht', 'id': '1'})
         self.assertEquals(resp.content, b'correct')
+
+    def test_dofillin_exercise_correct(self):
+        exercise = FillInExercise()
+        exercise.example = 'test *** test'
+        exercise.correct_answer = 'ja'
+        exercise.wrong_answer = 'nein'
+        exercise.second_wrong_answer = 'nein nein'
+        exercise.save()
+        self.assertEquals(len(FillInExercise.objects.all()), 1)
+        resp = self.client.post('/website/dofillins', {
+            'answer': 'ja', 'id': '1'})
+        self.assertEquals(resp.content, b'correct')
+        wrong_resp = self.client.post('/website/dofillins', {
+            'answer': 'ja', 'id': '1'})
+        self.assertEquals(wrong_resp.content, b'correct')
 
     def test_doreadings(self):
         resp = self.client.get('/website/doreading')
@@ -135,7 +148,7 @@ class DeutchMitSpassLoggedInStudent(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Student')
-        resp_post = self.client.post('/website/correction', {
+        self.client.post('/website/correction', {
             'correct_sentence': 'should not add',
             'second_correct_sentence': 'should not add',
             'wrong_sentence': 'should not be added'})
@@ -147,7 +160,7 @@ class DeutchMitSpassLoggedInStudent(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Student')
-        resp_post = self.client.post('/website/translation', {
+        self.client.post('/website/translation', {
             'example': 'should not add',
             'translated_example': 'should not add'})
 #       student should not add exercises
@@ -158,7 +171,7 @@ class DeutchMitSpassLoggedInStudent(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Student')
-        resp_post = self.client.post('/website/reading', {
+        self.client.post('/website/reading', {
             'text': 'Lorem ipsum .......................',
             'question': 'Ist das text ohne Wert',
             'first_choise': 'Ja',
@@ -172,6 +185,39 @@ class DeutchMitSpassLoggedInStudent(TestCase):
             })
 #       student should not add exercises
         self.assertEqual(len(ReadingExercise.objects.all()), 0)
+
+    def test_access_add_fillin(self):
+        resp = self.client.get('/website/fillin')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Student')
+        self.client.post('/website/fillin', {
+            'example': 'Du *** gut',
+            'correct_answer': 'bist',
+            'wrong_answer': 'ist',
+            'second_wrong_answer': 'hast'
+            })
+#       student should not add exercises
+        self.assertEqual(len(FillInExercise.objects.all()), 0)
+
+    def test_access_add_ordering(self):
+        resp = self.client.get('/website/ordering')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Student')
+        self.client.post('/website/ordering', {
+            'description': 'test',
+            'first': 'test1',
+            'second': 'test2',
+            'third': 'test3',
+            'fourt': 'test4',
+            'first_match': 'test11',
+            'second_match': 'test22',
+            'third_match': 'test33',
+            'fourt_match': 'test44',
+            })
+#       student should not add exercises
+        self.assertEqual(len(OrderingExercise.objects.all()), 0)
 
 
 class DeutchMitSpassLoggedInTeacher(TestCase):
@@ -211,8 +257,8 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         exercise.example = 'sehr gut'
         exercise.save()
         self.assertEquals(len(TranslationExercise.objects.all()), 1)
-        resp = self.client.post('/website/dotranslations',
-                {'answer': 'sehr gut', 'id': '1'})
+        resp = self.client.post('/website/dotranslations', {
+            'answer': 'sehr gut', 'id': '1'})
         self.assertEquals(resp.content, b'correct')
 
     def test_docorrections(self):
@@ -228,8 +274,8 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         exercise.wrong_sentence = 'nein schlecht'
         exercise.save()
         self.assertEquals(len(CorrectingExercise.objects.all()), 1)
-        resp = self.client.post('/website/docorrections',
-                {'answer': 'nicht schlecht', 'id': '1'})
+        resp = self.client.post('/website/docorrections', {
+            'answer': 'nicht schlecht', 'id': '1'})
         self.assertEquals(resp.content, b'correct')
 
     def test_access_exercises(self):
@@ -245,7 +291,7 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Teacher')
-        resp_post = self.client.post('/website/correction', {
+        self.client.post('/website/correction', {
             'correct_sentence': 'should be added',
             'second_correct_sentence': 'should be added',
             'wrong_sentence': 'should be add'})
@@ -257,7 +303,7 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('role' in resp.context)
         self.assertEqual(resp.context['role'], 'Teacher')
-        resp_post = self.client.post('/website/translation', {
+        self.client.post('/website/translation', {
             'example': 'should add',
             'translated_example': 'should add'})
 #       teacher should be able to add exercises
@@ -285,7 +331,7 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
         self.assertEqual(resp_post.status_code, 200)
 
     def test_doreadings_exercise_correct(self):
-        resp_post = self.client.post('/website/reading', {
+        self.client.post('/website/reading', {
             'text': 'Lorem ipsum .......................',
             'question': 'Ist das text ohne Wert',
             'first_choise': 'Ja',
@@ -298,6 +344,60 @@ class DeutchMitSpassLoggedInTeacher(TestCase):
             'fourt_is_correct': '0'
             })
         self.assertEquals(len(ReadingExercise.objects.all()), 1)
-        resp = self.client.post('/website/doreading',
-                {'answer': 'Ja', 'id': '1'})
+        resp = self.client.post('/website/doreading', {
+            'answer': 'Ja', 'id': '1'})
+        self.assertEquals(resp.content, b'correct')
+
+    def test_access_add_fillin(self):
+        resp = self.client.get('/website/fillin')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Teacher')
+        self.client.post('/website/fillin', {
+            'example': 'Du *** gut',
+            'correct_answer': 'bist',
+            'wrong_answer': 'ist',
+            'second_wrong_answer': 'hast'
+            })
+#       teacher should be able to add exercises
+        self.assertEqual(len(FillInExercise.objects.all()), 1)
+
+    def test_access_add_ordering(self):
+        resp = self.client.get('/website/ordering')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('role' in resp.context)
+        self.assertEqual(resp.context['role'], 'Teacher')
+        self.client.post('/website/ordering', {
+            'description': 'test',
+            'first': 'test1',
+            'second': 'test2',
+            'third': 'test3',
+            'fourt': 'test4',
+            'first_match': 'test11',
+            'second_match': 'test22',
+            'third_match': 'test33',
+            'fourt_match': 'test44',
+            })
+#       teacher should be able to add exercises
+        self.assertEqual(len(OrderingExercise.objects.all()), 1)
+
+    def test_doordering_exercise_correct(self):
+        self.client.post('/website/ordering', {
+            'description': 'test',
+            'first': 'test1',
+            'second': 'test2',
+            'third': 'test3',
+            'fourt': 'test4',
+            'first_match': 'test11',
+            'second_match': 'test22',
+            'third_match': 'test33',
+            'fourt_match': 'test44',
+            })
+        self.assertEquals(len(OrderingExercise.objects.all()), 1)
+        resp = self.client.post('/website/doorderings', {
+            'first': 'test11',
+            'second': 'test22',
+            'third': 'test33',
+            'fourt': 'test44',
+            'id': '1'})
         self.assertEquals(resp.content, b'correct')

@@ -45,3 +45,22 @@ class ReadingExerciseForm(forms.Form):
     fourt_choise = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'special'}), required=False)
     fourt_is_correct = forms.ChoiceField(choices=CHOICES)
+
+
+class FillInExerciseForm(forms.Form):
+    example = forms.CharField(widget=forms.Textarea)
+    correct_answer = forms.CharField(widget=forms.TextInput())
+    wrong_answer = forms.CharField(widget=forms.TextInput())
+    second_wrong_answer = forms.CharField(widget=forms.TextInput())
+
+
+class OrderingExerciseForm(forms.Form):
+    description = forms.CharField(widget=forms.TextInput())
+    first = forms.CharField(widget=forms.TextInput())
+    second = forms.CharField(widget=forms.TextInput())
+    third = forms.CharField(widget=forms.TextInput())
+    fourt = forms.CharField(widget=forms.TextInput())
+    first_match = forms.CharField(widget=forms.TextInput())
+    second_match = forms.CharField(widget=forms.TextInput())
+    third_match = forms.CharField(widget=forms.TextInput())
+    fourt_match = forms.CharField(widget=forms.TextInput())

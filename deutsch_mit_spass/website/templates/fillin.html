@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>Lücke füllen</title>
+    </head>
+    <body>
+        <p>
+            Verwenden Sie *** in dem Satz direkt,
+            es eine Lücke füllen zu machen
+        </p>
+        {% if role == 'Teacher' %}
+        <form action='fillin' method='POST'>
+        {% csrf_token %} 
+        {{ form.as_p }}
+        {% endif %}
+        <input type='submit' name='submit' value='Bild'>
+        </form>
+        {% if created %}
+        <span>Übung ist erfolgreich erstellt.</span>
+        {% endif %}
+    </body>
+</html>

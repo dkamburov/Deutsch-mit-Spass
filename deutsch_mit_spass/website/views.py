@@ -4,9 +4,9 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from website.forms import LoginForm, RegisterForm,\
     CorrectingExerciseForm, TranslatingExerciseForm,\
-    ReadingExerciseForm
+    ReadingExerciseForm, FillInExerciseForm, OrderingExerciseForm
 from website.models import CorrectingExercise, TranslationExercise,\
-    UserProfile, ReadingExercise, Choice
+    UserProfile, ReadingExercise, Choice, FillInExercise, OrderingExercise
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -132,6 +132,39 @@ def create_choices_reading(exercise, request):
                 is_correct=request.POST[choice + '_is_correct'])
 
 
+@login_required(login_url='/website/login')
+def fill_in_view(request):
+    return add_exercise(
+        request,
+        FillInExerciseForm,
+        ('example',
+            'correct_answer',
+            'wrong_answer',
+            'second_wrong_answer'),
+        FillInExercise.objects,
+        'fillin.html'
+    )
+
+
+@login_required(login_url='/website/login')
+def ordering_view(request):
+    return add_exercise(
+        request,
+        OrderingExerciseForm,
+        ('description',
+            'first',
+            'second',
+            'third',
+            'fourt',
+            'first_match',
+            'second_match',
+            'third_match',
+            'fourt_match'),
+        OrderingExercise.objects,
+        'ordering.html'
+    )
+
+
 def add_exercise(request, exercise_form, params, exercise_objects, template):
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
@@ -212,7 +245,6 @@ def do_translating_exercises(request):
 @login_required(login_url='/website/login')
 def do_reading_exercises(request):
     if request.method == 'POST':
-        selected_choice = request.POST['answer']
         choice_id = request.POST['id']
         choice = get_object_or_404(Choice, pk=choice_id)
         if choice.is_correct:
@@ -226,3 +258,60 @@ def do_reading_exercises(request):
         return render(request, 'reading-exercises.html', {
             'username': request.user.username,
             'reading_exercises': exercises})
+
+
+@csrf_exempt
+@login_required(login_url='/website/login')
+def do_fill_in_exercises(request):
+    if request.method == 'POST':
+        answer = request.POST['answer']
+        exercise_id = request.POST['id']
+        exercise = get_object_or_404(FillInExercise, pk=exercise_id)
+        if exercise.correct_answer == answer:
+            return HttpResponse('correct')
+        else:
+            return HttpResponse('notcorrect')
+    else:
+        exercises = FillInExercise.objects.all()
+        for exercise in exercises:
+                choices = [
+                    exercise.correct_answer,
+                    exercise.wrong_answer,
+                    exercise.second_wrong_answer]
+                shuffle(choices)
+                exercise.choices = choices
+        return render(request, 'fillin-exercises.html', {
+            'username': request.user.username,
+            'fillin_exercises': exercises})
+
+
+@csrf_exempt
+@login_required(login_url='/website/login')
+def do_ordering_exercises(request):
+    if request.method == 'POST':
+        first = request.POST['first']
+        second = request.POST['second']
+        third = request.POST['third']
+        fourt = request.POST['fourt']
+        exercise_id = request.POST['id']
+        exercise = get_object_or_404(OrderingExercise, pk=exercise_id)
+        if exercise.first_match == first and\
+                exercise.second_match == second and\
+                exercise.third_match == third and\
+                exercise.fourt_match == fourt:
+            return HttpResponse('correct')
+        else:
+            return HttpResponse('notcorrect')
+    else:
+        exercises = OrderingExercise.objects.all()
+        for exercise in exercises:
+                options = [
+                    exercise.first_match,
+                    exercise.second_match,
+                    exercise.third_match,
+                    exercise.fourt_match]
+                shuffle(options)
+                exercise.options = options
+        return render(request, 'ordering-exercises.html', {
+            'username': request.user.username,
+            'exercises': exercises})

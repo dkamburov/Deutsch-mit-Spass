@@ -14,11 +14,15 @@ from random import shuffle
 from django.contrib.auth.decorators import login_required
 
 
-def index(request):
-    return render(request, 'home.html', locals())
-
-
 def login_view(request):
+    '''Handle login
+
+    If login is successful redirect to welcome page
+    if not it redirects to other pages accordingly
+
+    Keyword arguments:
+    request -- request from client
+    '''
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -43,6 +47,16 @@ def login_view(request):
 
 
 def welcome(request):
+    '''Show initial page
+
+    Shows the funcionality, according to the role of the user
+    for Teacher it show functionality for building and doing exercises
+    for Student it show only functionality for doing exercises
+    if anonymous it ask for login or registration
+
+    Keyword arguments:
+    request -- request from client
+    '''
     if request.user.is_anonymous():
         return render(request, 'welcome.html')
     profile = UserProfile.objects.filter(user=request.user)[0]
@@ -54,11 +68,20 @@ def welcome(request):
 
 
 def logout_view(request):
+    '''Logout and redirect to welcome'''
     logout(request)
     return redirect('welcome')
 
 
 def register_view(request):
+    '''Registration view
+
+    Register users, by default makes them Students
+    If registertion is successful, it show button to log in
+
+    Keyword arguments:
+    request -- request from client
+    '''
     data = request.POST if request.POST else None
     form = RegisterForm(data)
     registered = False
@@ -78,6 +101,15 @@ def register_view(request):
 
 @login_required(login_url='/website/login')
 def exercises_view(request):
+    '''View exercise types to build
+
+    This view is only for teachers it does not show types to students
+    Leads to template from which teacher can navigate to specific type
+    of exercise, they want to build
+
+    Keyword arguments:
+    request -- request from client
+    '''
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
     return render(request, 'exercises.html', {
@@ -88,6 +120,7 @@ def exercises_view(request):
 
 @login_required(login_url='/website/login')
 def correction_view(request):
+    '''View for correction type of exercises'''
     return add_exercise(
         request,
         CorrectingExerciseForm,
@@ -101,6 +134,7 @@ def correction_view(request):
 
 @login_required(login_url='/website/login')
 def translation_view(request):
+    '''View for translation type of exercises'''
     return add_exercise(
         request,
         TranslatingExerciseForm,
@@ -113,6 +147,7 @@ def translation_view(request):
 
 @login_required(login_url='/website/login')
 def reading_view(request):
+    '''View for reading type of exercises'''
     return add_exercise(
         request,
         ReadingExerciseForm,
@@ -124,6 +159,15 @@ def reading_view(request):
 
 
 def create_choices_reading(exercise, request):
+    '''Method for creating choices for reading exercise
+
+    For each choice teacher created it creates Choice and links it to
+    ReadingExercise(many to one)
+
+    Keyword arguments:
+    exercise (ReadingExercise) -- Reading exercise to link the choices
+    request -- request from client
+    '''
     for choice in ['first', 'second', 'third', 'fourt']:
         if request.POST[choice + '_choise']:
             Choice.objects.create(
@@ -134,6 +178,7 @@ def create_choices_reading(exercise, request):
 
 @login_required(login_url='/website/login')
 def fill_in_view(request):
+    '''View for fill in type of exercises'''
     return add_exercise(
         request,
         FillInExerciseForm,
@@ -148,6 +193,7 @@ def fill_in_view(request):
 
 @login_required(login_url='/website/login')
 def ordering_view(request):
+    '''View for ordering type of exercises'''
     return add_exercise(
         request,
         OrderingExerciseForm,
@@ -166,6 +212,17 @@ def ordering_view(request):
 
 
 def add_exercise(request, exercise_form, params, exercise_objects, template):
+    '''Add exercise of specific type
+
+    This function is called by all views for creating exercises
+
+    Keyword arguments:
+    request -- request from client
+    exercise_form -- specific form for the creating exercises
+    params -- parameters passed to the POST request
+    exercise_objects -- objects of the specific exercise
+    template -- in which template the form will be filled by the user
+    '''
     profile = UserProfile.objects.filter(user=request.user)[0]
     role = profile.ROLE_CHOISES[profile.role][1]
     if request.method == 'POST' and\
@@ -195,6 +252,15 @@ def add_exercise(request, exercise_form, params, exercise_objects, template):
 
 @login_required(login_url='/website/login')
 def do_exercises(request):
+    '''View exercise types to do
+
+    This view is for both type of users students and teachers
+    Leads to template for navigation to specific type
+    of exercise, they want to do
+
+    Keyword arguments:
+    request -- request from client
+    '''
     return render(request, 'do_exercises.html', {
         'username': request.user.username
         })
@@ -203,6 +269,7 @@ def do_exercises(request):
 @csrf_exempt
 @login_required(login_url='/website/login')
 def do_correcting_exercises(request):
+    '''View for doing correction type of exercises'''
     if request.method == 'POST':
         answer = request.POST['answer']
         exercise_id = request.POST['id']
@@ -222,6 +289,7 @@ def do_correcting_exercises(request):
 @csrf_exempt
 @login_required(login_url='/website/login')
 def do_translating_exercises(request):
+    '''View for doing translation type of exercises'''
     if request.method == 'POST':
         answer = request.POST['answer']
         exercise_id = request.POST['id']
@@ -244,6 +312,7 @@ def do_translating_exercises(request):
 @csrf_exempt
 @login_required(login_url='/website/login')
 def do_reading_exercises(request):
+    '''View for doing reading type of exercises'''
     if request.method == 'POST':
         choice_id = request.POST['id']
         choice = get_object_or_404(Choice, pk=choice_id)
@@ -263,6 +332,7 @@ def do_reading_exercises(request):
 @csrf_exempt
 @login_required(login_url='/website/login')
 def do_fill_in_exercises(request):
+    '''View for doing fill in type of exercises'''
     if request.method == 'POST':
         answer = request.POST['answer']
         exercise_id = request.POST['id']
@@ -288,6 +358,7 @@ def do_fill_in_exercises(request):
 @csrf_exempt
 @login_required(login_url='/website/login')
 def do_ordering_exercises(request):
+    '''View for doing ordering type of exercises'''
     if request.method == 'POST':
         first = request.POST['first']
         second = request.POST['second']

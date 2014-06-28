@@ -7,10 +7,12 @@
         <h1>Herzlichen Willkommen, {{ username }} !</h1>
         <p>Du bist lehrer, oder?</p>
         <button onclick='location.href="/website/exercises"'>Übungen bilden</button>
+        <button onclick='location.href="/website/doexercises"'>Übungen machen</button>
         <button onclick='location.href="/website/logout"'>Austragen</button>
         {% elif role == 'Student' %}
         <h1>Herzlichen Willkommen, {{ username }} !</h1>
         <p>Hello, Du willst Deutsch lernen?</p>
+        <button onclick='location.href="/website/doexercises"'>Übungen machen</button>
         <button onclick='location.href="/website/logout"'>Austragen</button>
         {% else %}
         <h2>Hello, Du willst Deutsch lernen? </h2>
